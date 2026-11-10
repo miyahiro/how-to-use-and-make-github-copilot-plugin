@@ -1,0 +1,10 @@
+{
+  "name": "spec-driven-development",
+  "version": "0.6.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "bin": { "sdd": "bin/sdd.mjs" },
+  "files": ["bin", "lib", "plugins"],
+  "scripts": { "test": "node --test test/*.test.mjs" }
+}
