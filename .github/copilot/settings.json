@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "spec-driven-development": {
+      "source": {
+        "source": "directory",
+        "path": "./ai-powered-spec-drivien-development"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "sdd@spec-driven-development": true
+  }
+}
