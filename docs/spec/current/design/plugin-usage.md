@@ -21,11 +21,17 @@
 | 章構成 | 動作確認環境 | 導入手順より前に、記事作成時に実際に確認した環境を掲載する。掲載項目と確認状況の区別は下記に従う。 | NFR-USE-001, NFR-USE-002 | AC-USE-006, AC-USE-009 |
 | 章構成 | Plugin とは | Agent Plugin が関連するエージェントカスタマイズをまとめる仕組みであること、拡張機能との違い、課題と利点を簡潔に説明する。効果や全クライアントでの互換性を保証しない。 | REQ-USE-001, REQ-USE-007 | AC-USE-001, AC-USE-007 |
 | 章構成 | 見つける・内容を確認する | 提供元、同梱ファイル、README、実行コード（hooks、MCP servers 等）を確認し、出所を信頼できるか判断してから導入へ進む。社内 marketplace は利用対象者だけにアクセスを許可した GitHub private repository で管理する。 | REQ-USE-002, REQ-USE-006 | AC-USE-002, AC-USE-005 |
-| 章構成 | 導入と有効化 | 社内 marketplace の利用者は認証済み GitHub アカウントで読み取り権限を確認し、取得したソースを確認してから導入する。非公開リポジトリの直接登録は仮定せず、Git／ローカルソースを含む公式にサポートされた方法を対象バージョンの資料・新しい検証環境で確認する。User／Workspace は導入先、グローバル／Workspace は有効化範囲の別の選択として説明する。 | REQ-USE-002, REQ-USE-003 | AC-USE-002, AC-USE-003 |
-| 章構成 | プロジェクト単位で使い分ける | `.github/copilot/settings.json` に関する公式資料上の仕様と、利用者から報告された実機結果を別々に示す。設定によるリポジトリ既定値と各利用者の Workspace 有効化・無効化を混同せず、harness／クライアント別に確認済み・未確認を表示する。 | REQ-USE-004 | AC-USE-003, AC-USE-006 |
+| 章構成 | Plugin を使えるようにする（全体像） | 「marketplace の追加 → Plugin のインストール → Plugin の有効化 → ディレクトリごとの設定」の4ステップと、各ステップが CLI／VS Code の Copilot Chat のどちらに効くかを冒頭で一覧にし、以下の節で各ステップを詳しく説明する。 | REQ-USE-002〜004 | AC-USE-002, AC-USE-003 |
+| 章構成（節） | ステップ1: marketplace の追加 | 公式資料にある3つの追加元（GitHub の `OWNER/REPOSITORY`、Git URL、ローカルディレクトリ）をそれぞれ説明する。社内 marketplace の利用者は認証済み GitHub アカウントで読み取り権限を確認する。private repository の直接追加は、公式仕様と実機確認の範囲を区別して記す。一覧・参照・削除のコマンドも扱う。 | REQ-USE-002, REQ-USE-006 | AC-USE-002, AC-USE-005 |
+| 章構成（節） | ステップ2: Plugin のインストール | 登録済み marketplace から `PLUGIN-NAME@MARKETPLACE-NAME` で導入する。`@` の右側は登録済み marketplace 名であることを示す。 | REQ-USE-002, REQ-USE-003 | AC-USE-002, AC-USE-003 |
+| 章構成（節） | ステップ3: Plugin の有効化 | 有効化・無効化（アンインストールとは別）と、導入先と有効化範囲の違いを説明する。VS Code の Copilot Chat では CLI でのグローバルな導入・有効化が必要だった実機結果を、確認環境とともに示す。 | REQ-USE-003 | AC-USE-003, AC-USE-006 |
+| 章構成（節） | ステップ4: ディレクトリごとの設定 | `.github/copilot/settings.json` によるリポジトリ既定値（marketplace と有効にする Plugin）と、個人の上書き（`.github/copilot/settings.local.json`）を説明する。公式資料上の仕様と実機結果を分け、VS Code の Copilot Chat では動作しなかったことを明示する。 | REQ-USE-004 | AC-USE-003, AC-USE-006 |
 | 章構成 | 利用を確かめる | 意図した Workspace と harness を開き、Plugin の有効状態を確認した後、代表的な作業で効果を確かめる。 | REQ-USE-005 | AC-USE-004 |
-| 章構成 | 更新・無効化・削除 | 更新、無効化、アンインストールの説明を対象バージョンの公式資料で確認して掲載する。提供元・内容の再確認を促す。 | REQ-USE-006 | AC-USE-005 |
-| 章構成 | 既存 Plugin をプロジェクトに合わせる | ソースを fork／コピーして変更する方法と、元 Plugin を変更せず Workspace 側の指示・スキル・エージェント等で補う方法を短く比較する。後者の具体例は一つだけ載せる（内部設計 DES-USE-003）。キャッシュの直接編集は案内しない。 | REQ-USE-008 | AC-USE-008 |
+| 章構成 | 更新・削除 | 更新、アンインストール、marketplace の削除の説明を対象バージョンの公式資料で確認して掲載する。提供元・内容の再確認を促す。 | REQ-USE-006 | AC-USE-005 |
+| 章構成 | 利用上の Tips | 利用方法の Tips を章としてまとめ、Tips ごとに節を分ける。少なくとも次の節を置く。 | REQ-USE-004, REQ-USE-005, REQ-USE-008, REQ-USE-009 | AC-USE-003, AC-USE-004, AC-USE-008, AC-USE-010 |
+| 章構成（節） | Tips: プロジェクトごとに使い分ける | チームのリポジトリ既定値（ステップ4）と各利用者の有効化・無効化・ローカル上書きを区別し、harness／クライアント別に確認済み・未確認を示す。 | REQ-USE-004 | AC-USE-003, AC-USE-006 |
+| 章構成（節） | Tips: VS Code の Copilot Chat で使う | harness の選択とグローバルな導入の必要性、見つからないときの確認順を示す。 | REQ-USE-005, REQ-USE-009 | AC-USE-004, AC-USE-010 |
+| 章構成（節） | Tips: 既存 Plugin をプロジェクトに合わせる | ソースを fork／コピーして変更する方法と、元 Plugin を変更せず Workspace 側の指示・スキル・エージェント等で補う方法を短く比較する。後者の具体例は一つだけ載せる（内部設計 DES-USE-003）。キャッシュの直接編集は案内しない。 | REQ-USE-008 | AC-USE-008 |
 | 章構成 | 制約・確認状況 | 環境差や未確認事項を明示し、代替手順は確認できた環境・結果がある場合だけ紹介する。未検証の代替策を動作確認済みとしない。 | REQ-USE-009 | AC-USE-010 |
 
 #### 「動作確認環境」章の掲載項目
@@ -53,10 +59,10 @@
 
 1. 利用者は許可された GitHub アカウントで認証し、marketplace の private repository に読み取り権限があることを確認する。アクセス拒否時は導入を中断し、管理者へ権限を確認する。資格情報を記事・共有ログへ貼り付けない。
 2. 認証済み環境から marketplace を取得する。marketplace 定義と参照先、Plugin の提供元・コード・設定・版・変更履歴を確認し、信頼できると判断してから導入する。
-3. 非公開リポジトリを特定クライアントへ直接登録できるとは仮定しない。認証済みローカル clone を経由した登録は候補とし、対象の VS Code 1.145.3 と対象 harness／クライアントそれぞれで、公式資料に照合した方法を新しい環境で確認する。未照合の URL、manifest、CLI 構文を確定操作として記事に載せない。
+3. marketplace の追加元は、公式資料（GitHub Docs「GitHub Copilot CLI のプラグインの検索とインストール」）にある GitHub の `OWNER/REPOSITORY`、Git URL、ローカルディレクトリの3つを記事で説明する。private repository を `OWNER/REPOSITORY`／Git URL で直接追加するときの認証は公式資料で確認できていないため、実機で確認できるまで成功を保証しない。認証済みローカル clone をディレクトリとして追加する方法は、実機で確認できた方法として示す。未照合の URL、manifest、CLI 構文を確定操作として記事に載せない。
 4. 更新時は clone を取得元と照合して更新し、変更・版・コードを再確認したうえで、確認済みの方法で marketplace と Plugin を更新する。更新後に対象環境で利用できることを確認し、環境・版・操作・結果を記録する。
 
-利用者の既報告として、ローカル marketplace を CLI から登録して Plugin を導入すると、Copilot CLI と VS Code の両方で利用できたとの記録がある（`docs/spec/changes/CHG-0001/note.md`）。この報告は本作業で再現確認しておらず、新規環境の検証結果や任意の private repository／クライアントの直接登録対応を示すものではない。報告された CLI の具体的な構文も公式資料と対象バージョンで照合するまでは確定手順として扱わない。
+利用者の実機確認（VS Code 1.145.3、Copilot CLI 1.0.109。`docs/spec/changes/CHG-0001/note.md`）では、ローカル marketplace を CLI から追加して Plugin を導入すると、harness が Copilot の VS Code の Copilot Chat で Plugin のエージェントが表示された。`.github/copilot/settings.json` は CLI では効いたが、VS Code の Copilot Chat では効かなかった。これらは既存の導入状態に依存しない新規環境の検証結果ではなく、任意の private repository／クライアントでの直接追加の対応を示すものでもない。
 
 GitHub private repository のアクセス制御は取得前のアクセス範囲を制限するが、許可された利用者が取得・導入した Plugin を複製・再配布することを防ぐものではない。記事で配布元の非公開性を導入先での再配布防止保証として説明しない。
 
