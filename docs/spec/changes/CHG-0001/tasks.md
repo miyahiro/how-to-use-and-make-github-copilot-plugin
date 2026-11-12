@@ -1,5 +1,13 @@
 # CHG-0001 タスク一覧
 
+## 2026-11-12: 利用編の sdd 記述削除と実機確認結果の反映
+
+- TASK-7 の一部を更新。利用者の依頼により、読者が参照できない sdd（参考実装・marketplace 定義・README・導入例の名前）への言及を `articles/plugin-usage.md` から削除し、導入例・settings.json 例を `<plugin-name>@<marketplace-name>` 等のプレースホルダーにした。利用編の要件・設計に sdd の記載はなく、必須説明の削除には当たらない。
+- TASK-2・TASK-9 の一部として、利用者による実機確認（Ubuntu 24.04／GitHub Codespaces、VS Code 1.145.3 (user setup)、Copilot CLI 1.0.109）を §2 環境章・§4.2・§4.3・§5・§6 に反映した。
+- 確認: `grep -n -i "sdd\|spec-driven\|参考実装\|ai-powered\|1\.145\.2" articles/plugin-usage.md` → 該当なし（exit 1）。`git --no-pager diff --check` → 3行目の意図した Markdown 改行（行末2空白、既存）のみ。`git --no-pager diff --stat` → `articles/plugin-usage.md` 1 ファイル。レンダリング確認・独立レビューは未実施。
+- 利用者の指示で対象版を VS Code 1.145.3 に改め（Q-11）、記事の CLI 表記を 1.0.109 に統一、参照欄の作業メモへのリンクを削除した。
+- 新環境（既存導入状態に依存しない環境）での再現、更新・無効化・削除、Workspace 補完の効果は未実施のため、TASK-7 は `blocked`、TASK-9 は `todo` のまま。
+
 ## 2026-11-10: 利用編の追記結果
 
 - TASK-2・TASK-7 の一部を更新。利用者提供の CLI 1.0.108 の版・ヘルプ出力を手動照合し、marketplace の source 形式、事前登録、`plugin@marketplace`、`install` 表記を記事・メモへ反映した。登録元のローカルパスと `@` 右側の marketplace 名を分離した。
@@ -30,7 +38,7 @@
 
 | ID | 内容 | 要件・受入条件 | 設計 | 確認方法 | 状態 | 結果 |
 | --- | --- | --- | --- | --- | --- | --- |
-| TASK-1 | **公式根拠と対象版を調査**。依存: なし。利用ガイド、authoring reference、必要な版別資料・リリース情報を調べ、VS Code 1.145.2、Copilot 拡張、harness、CLI の対応範囲と現行資料との差を整理する。Plugin の役割、拡張機能との差、課題・利点も裏付ける。範囲: メモの調査記録。完了: 説明・操作ごとの根拠URL、確認日、資料が対象とする版、対象版への一致／不明を追跡できる。 | REQ-USE-001, REQ-USE-007, NFR-USE-001, NFR-AUTHOR-001 / AC-USE-001, AC-USE-006, AC-USE-007, AC-AUTHOR-006 | DES-USE-001, DES-USE-002, DES-AUTHOR-001, DES-AUTHOR-003, DES-AUTHOR-005 | 公式資料の記述と版別情報を手動照合。版を確認できない場合は推測せず未確認とし、公式仕様・既報告・今回の実測を別欄にする。 | blocked | ローカル要件の公式参照URLを確認。ページ取得・対象版照合は未実施（下記結果）。作成編部分は未着手。 |
+| TASK-1 | **公式根拠と対象版を調査**。依存: なし。利用ガイド、authoring reference、必要な版別資料・リリース情報を調べ、VS Code 1.145.3、Copilot 拡張、harness、CLI の対応範囲と現行資料との差を整理する。Plugin の役割、拡張機能との差、課題・利点も裏付ける。範囲: メモの調査記録。完了: 説明・操作ごとの根拠URL、確認日、資料が対象とする版、対象版への一致／不明を追跡できる。 | REQ-USE-001, REQ-USE-007, NFR-USE-001, NFR-AUTHOR-001 / AC-USE-001, AC-USE-006, AC-USE-007, AC-AUTHOR-006 | DES-USE-001, DES-USE-002, DES-AUTHOR-001, DES-AUTHOR-003, DES-AUTHOR-005 | 公式資料の記述と版別情報を手動照合。版を確認できない場合は推測せず未確認とし、公式仕様・既報告・今回の実測を別欄にする。 | blocked | ローカル要件の公式参照URLを確認。ページ取得・対象版照合は未実施（下記結果）。作成編部分は未着手。 |
 | TASK-2 | **導入スコープ・有効化・クライアント差を調査**。依存: TASK-1。提供元・内容・README の確認、marketplace／Git／ローカル導入、User／Workspace 導入とグローバル／Workspace 有効化、対象 harness／Workspace での発見・利用確認を調べる。`.github/copilot/settings.json` のリポジトリ既定値の適用先を harness／CLI／VS Code Copilot Chat 別に整理。既報告の設定不動作と、`copilot plugin marketplace add`・`copilot plugin add` による両クライアントでの利用について、構文・版・共有条件を確認する。範囲: メモ。完了: 再現検証すべき条件と未確認差異が明確。 | REQ-USE-002〜005, NFR-USE-001 / AC-USE-002〜004, AC-USE-006 | DES-USE-001, DES-USE-002, DES-USE-004 | 各操作・設定を公式根拠へ対応付け、導入先と有効化範囲を別軸でレビュー。メモの利用者報告を再現済みの証拠にせず、報告された CLI 構文も未照合のまま確定しない。 | blocked | 既報告と未確認条件を分離。CLIヘルプ・設定仕様・共有条件の照合は未実施（下記結果）。 |
 | TASK-3 | **管理・安全確認・カスタマイズ例を調査**。依存: TASK-1, TASK-2。更新・無効化・アンインストール、hooks／MCP 等の内容確認を調べる。fork／コピーと Workspace 補完の適用場面・変更元管理・更新追従を比較し、元 Plugin を変更しない具体例1つに必要な指示ファイル名・配置・適用範囲を確認する。題材は回答にプロジェクトのテスト実行方法を含める補完。範囲: メモ。完了: 比較材料、補完前後の同一入力・期待差、管理操作の検証候補がそろう。 | REQ-USE-006, REQ-USE-008, REQ-USE-009, NFR-USE-002 / AC-USE-005, AC-USE-008〜010 | DES-USE-001, DES-USE-002, DES-USE-003, DES-USE-004 | 公式仕様と対象版に照合。キャッシュ直接編集を推奨せず、元 Plugin 不変と補完効果をどう観測するかレビュー。代替策は候補と動作確認済みを区別する。 | blocked | sdd READMEの指示ファイル候補を確認。管理操作・配置・適用範囲の公式照合は未実施。 |
 | TASK-4 | **最小 Plugin／marketplace と sdd 参考例を調査**。依存: TASK-1。公式 reference で `plugin.json` の識別・説明等の必須項目、schema、正確な配置、Copilot 固有の名前空間、skill 本文の記述形式、marketplace の schema・参照先・相対パスを調べる。同一 repository に定義と単一 skill の「変更引き継ぎメモ」Plugin を置く最小構成、導入・実行構文、構成確認方法を整理。sdd の README・manifest・skills・agents・marketplace 所在を読み、参照版と対応関係を記録する。範囲: メモ、sdd は読取のみ。完了: 必須仕様と参考例固有の規約を分離できる。 | REQ-AUTHOR-001〜004, REQ-AUTHOR-007, NFR-AUTHOR-001 / AC-AUTHOR-001〜004, AC-AUTHOR-007 | DES-AUTHOR-001〜004 | 公式 schema・記述規則と構成候補を照合し、必要ファイルの内容・配置の不足を確認。sdd の現行版・参照パスを別途確認し、一般仕様の根拠に流用しない。サンプルの作成・実行はここではしない。 | todo | 未実施 |
@@ -88,7 +96,7 @@
 
 ## 記録する根拠・検証情報
 
-- 調査: 対象の説明・手順、公式根拠URL、確認日、資料の対象版、VS Code 1.145.2／使用クライアント版との一致・不明、未確認点。既報告は `note.md` を出典とし、新規実測と別欄にする。
+- 調査: 対象の説明・手順、公式根拠URL、確認日、資料の対象版、VS Code 1.145.3／使用クライアント版との一致・不明、未確認点。既報告は `note.md` を出典とし、新規実測と別欄にする。
 - 実測: 確認日、OS・版、ローカル／リモート形態、VS Code・Copilot 関連拡張名と版、harness／クライアント・使用CLIの版、Plugin／marketplace の版またはコミット、導入方法・導入先・有効化範囲、Workspace 事前状態、実施者、操作、期待結果、実際の結果、未実施・失敗範囲。両記事の環境章から記録へ対応付ける。不明な値は推測せず秘密の値は含めない。
 
 ## 結果（前回のタスク分解）

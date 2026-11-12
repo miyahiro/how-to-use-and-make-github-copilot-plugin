@@ -1,5 +1,15 @@
 # 作業メモ
 
+## 2026-11-12: 利用者による実機確認（環境と結果）
+
+- 出典は利用者の会話での共有。確認者は利用者（人）。
+- 環境: OS Ubuntu 24.04、GitHub Codespaces、VS Code 1.145.3 (user setup)、GitHub Copilot CLI 1.0.109。Copilot 関連拡張の名前・版、Plugin／marketplace の版・コミット、事前の導入状態は未確認。
+- CLI: `.github/copilot/settings.json` に marketplace（`extraKnownMarketplaces`）と Plugin（`enabledPlugins`）の定義があり、CLI の起動ディレクトリがその `.github` の親ディレクトリ配下なら、定義した Plugin のエージェントを利用できた。設定例の形はこのリポジトリの `.github/copilot/settings.json`（`source.source: "directory"`、`path` は repository ルートからの相対パス）。
+- VS Code: Copilot Chat で harness に Copilot を選び、`copilot plugin marketplace add <マーケットプレイスのディレクトリ>`、`copilot plugin install <プラグイン名>@<マーケットプレイス名>` で導入すると、エージェント一覧に Plugin のエージェントが表示された。利用者の結論は「グローバルに有効にしないと VS Code では利用できない」「harness が Copilot でないとうまく動作しない」。代表的な作業の実行結果の詳細は共有されていない。
+- 2026-11-10 の既報告「settings.json は CLI と VS Code の両方で有効にならなかった」は、CLI については今回の確認（起動ディレクトリの条件付きで利用できた）で更新された。VS Code で settings.json が効かない点は一致。
+- 要件・設計の対象版は VS Code 1.145.2 だが、確認は 1.145.3。記事の環境章は確認した版で記載した。
+- Q-11 の回答（2026-11-12）で対象版を 1.145.3 に変更。記事の CLI 表記は 1.0.109 に統一した。ただし source 形式（owner/repo・URL・ローカルパス）・事前登録必須・`install` 表記を読み取ったヘルプ出力は 1.0.108 で取得したもの。1.0.109 で実行して確認できたのは `marketplace add <ディレクトリ>` と `install <plugin>@<marketplace>` の利用結果。
+
 ## 2026-11-10: 利用者提供の CLI 1.0.108 ヘルプとの照合
 
 - 出典は利用者が会話に貼り付けた `copilot --version`、`copilot plugin marketplace add --help`、`copilot plugin add --help` の実行出力。版は GitHub Copilot CLI 1.0.108。
