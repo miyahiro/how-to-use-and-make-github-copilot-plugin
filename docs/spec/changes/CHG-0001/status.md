@@ -40,9 +40,11 @@ branch: change/CHG-0001
 | --- | --- | --- | --- |
 | requirements | 2026-11-10 | 宮下 洋 | docs/spec/current/requirements/plugin-usage.md, docs/spec/current/requirements/plugin-authoring.md, docs/spec/current/requirements/article-publication.md, docs/spec/changes/CHG-0001/idea.md |
 | design | 2026-11-10 | 宮下 洋 | docs/spec/current/design/plugin-usage.md, docs/spec/current/design/plugin-authoring.md, docs/spec/current/design/article-publication.md |
+| requirements | 2026-11-12 | 宮下 洋 | docs/spec/current/requirements/plugin-usage.md, docs/spec/current/requirements/plugin-authoring.md, docs/spec/current/requirements/article-publication.md, docs/spec/changes/CHG-0001/idea.md |
 
 ## 次の作業
 
+- 2026-11-12: 利用者の依頼で利用編を4ステップ（marketplace の追加・Plugin のインストール・有効化・ディレクトリごとの設定）と利用上の Tips の章に再構成し、設計 DES-USE-001・DES-USE-004 を変更した。GitHub Docs「GitHub Copilot CLI のプラグインの検索とインストール」を取得・照合し、marketplace の追加元3種と管理コマンドを反映。requirements・design の再承認待ち。
 - 2026-11-12: 利用者の依頼で、読者が参照できない sdd への言及を利用編から削除し、導入例をプレースホルダーにした。利用者の実機確認（Ubuntu 24.04／Codespaces、VS Code 1.145.3、CLI 1.0.109）を環境章と §4〜6 に反映。CLI は `.github/copilot/settings.json` で利用可、VS Code は CLI でのグローバル導入と harness Copilot が必要。詳細は `note.md`。新環境での再現・管理操作・Workspace 補完は未確認。Q-11 の回答により対象版を VS Code 1.145.3 に改め、要件・設計を修正したため requirements・design の再承認待ち。記事の CLI 表記は 1.0.109 に統一し、参照欄の作業メモへのリンクを削除した。
 - 利用者提供の CLI 1.0.108 ヘルプを照合済み。登録元は owner/repo・URL・ローカルパス、導入は登録済み marketplace の `plugin@marketplace`、ヘルプの表記は `install`。以下の従来の未確認事項のうち版・登録／導入構文は解消したが、導入先・管理操作・両クライアントの利用確認は未解消。実機導入成功とは扱わない。
 - 実装: 利用者から利用編の調査・執筆開始と原稿配置・READMEリンクの明確な許可を受領し、[利用編草稿](../../../../articles/plugin-usage.md) と入口リンクを作成。ローカル出典と既報告を整理したが、公開完成稿ではない。[tasks.md](tasks.md) の TASK-1・2・3・5・6・7 は `blocked`、残る7件は `todo`。共有タスクの作成編部分は未着手。
