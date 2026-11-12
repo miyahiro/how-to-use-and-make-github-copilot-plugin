@@ -1,7 +1,7 @@
 # GitHub Copilot Plugin 利用編：社内 marketplace から導入し、CLI と VS Code で使う
 
 > **調査・検証待ちの草稿（2026-11-12）**  
-> この記事は公開完成稿ではありません。筆者の環境（VS Code 1.145.3、GitHub Copilot CLI 1.0.109）での確認結果と、CLI のヘルプ出力を基に構成しています。最新の公式ページとの照合、更新・無効化・削除の確認、既存の導入状態に依存しない新しい環境での再現確認は未実施です。
+> この記事は公開完成稿ではありません。筆者の環境（VS Code 1.145.3、GitHub Copilot CLI 1.0.109）での確認結果と、GitHub Docs の公式資料・CLI のヘルプ出力を基に構成しています。更新・削除の確認、既存の導入状態に依存しない新しい環境での再現確認は未実施です。
 
 ## 1. Plugin とは：何をまとめ、何を楽にするのか
 
@@ -13,12 +13,10 @@ VS Code 拡張機能と同じものではありません。この記事では、
 
 この記事の読者は、Copilot Chat を使い始め、社内で配られた Plugin を安全に試したい開発者です。流れは次のとおりです。
 
-1. 利用を許可された GitHub private repository から marketplace を取得する。
-2. 中身を確認し、`copilot` コマンドからローカル marketplace を登録して Plugin を導入する。
-3. GitHub Copilot CLI と VS Code の GitHub Copilot Chat で、それぞれ利用できるか確認する。
-4. プロジェクトに合わせて使い分け、必要に応じて更新・無効化・削除する。
-
-以下では、確定できた説明と、公開前に埋める必要がある操作を分けます。
+1. 導入前に、取得元と Plugin の中身を確認する（§3）。
+2. 「marketplace の追加 → Plugin のインストール → Plugin の有効化 → ディレクトリごとの設定」の4ステップで使えるようにする（§4）。
+3. GitHub Copilot CLI と VS Code の GitHub Copilot Chat で、それぞれ利用できるか確認する（§5）。
+4. 必要に応じて更新・削除する（§6）。使い分けのコツは Tips にまとめます（§7）。
 
 ## 2. 動作確認環境
 
@@ -35,17 +33,17 @@ VS Code 拡張機能と同じものではありません。この記事では、
 | Plugin／marketplace の検証版・コミット | 未確認 |
 | Workspace の事前状態 | 未確認（既存の導入状態に依存しない新しい環境かどうかを含む） |
 | 確認できたこと | 次の箇条書きのとおり |
-| 未確認 | 更新・無効化・削除、Workspace 補完の効果、新しい環境での再現 |
+| 未確認 | GitHub／Git URL からの marketplace 追加、有効化・無効化の切り替え、更新・削除、Workspace 補完の効果、新しい環境での再現 |
 
 この環境で確認できたことは次のとおりです。
 
 - **CLI**：`.github/copilot/settings.json` に marketplace と Plugin の定義があると、その `.github` の親ディレクトリ配下で GitHub Copilot CLI を起動したとき、定義した Plugin のエージェントを利用できた。
-- **VS Code**：`copilot plugin marketplace add` と `copilot plugin install` で marketplace を登録し Plugin を導入（グローバルに有効化）すると、harness に Copilot を選んだ GitHub Copilot Chat のエージェント一覧に Plugin のエージェントが表示された。グローバルに有効にしないと、VS Code では利用できなかった。
+- **VS Code**：ローカルディレクトリの marketplace を `copilot plugin marketplace add` で追加し、`copilot plugin install` で Plugin を導入（グローバルに有効化）すると、harness に Copilot を選んだ GitHub Copilot Chat のエージェント一覧に Plugin のエージェントが表示された。グローバルに有効にしないと、VS Code では利用できなかった。
 - **harness**：VS Code で harness が Copilot 以外のときは、うまく動作しなかった。
 
-最新の公式資料とはまだ照合していません。参照欄の公式 URL は確認先であり、上記の版への適合を公式資料で確認済みという意味ではありません。
+本文では、公式資料に書かれていることと、筆者の環境で確認したことを分けて書きます。
 
-## 3. 導入前の前提と安全確認
+## 3. 導入前の確認
 
 社内 marketplace は、利用対象者だけにアクセスを許可した GitHub private repository で管理する想定です。公開記事には実際の社内 URL や認証情報を載せません。取得元は社内の管理者から案内を受けてください。
 
@@ -62,132 +60,207 @@ VS Code 拡張機能と同じものではありません。この記事では、
 
 private repository のアクセス制御は、取得前のアクセス範囲を制限します。取得済みの内容の複製・再配布まで防ぐ保証ではありません。社内の取り扱いルールも別に必要です。
 
-## 4. private marketplace を取得し、CLI から導入する
+## 4. Plugin を使えるようにする：4つのステップ
 
-### 4.1 許可された取得元を手元で確認する
+Plugin を使えるようにするまでには、次の4つのステップがあります。ステップ1〜3は個人の環境での操作、ステップ4は repository に置くチーム向けの設定です。
 
-認証済みの環境で、管理者から案内された repository をローカルに clone し、取得元と対象の版を照合する流れを想定しています。この作業では実際の取得は行っていません。
+| ステップ | 何をするか | GitHub Copilot CLI | VS Code の GitHub Copilot Chat（筆者の環境） |
+| --- | --- | --- | --- |
+| 1. marketplace の追加 | Plugin を探すカタログを登録する | 必要 | 必要（CLI で追加） |
+| 2. Plugin のインストール | カタログから使う Plugin を導入する | 必要 | 必要（CLI で導入） |
+| 3. Plugin の有効化 | 導入した Plugin を使える状態にする | インストールで有効になる。オン／オフを切り替えられる | グローバルに有効化されている必要がある |
+| 4. ディレクトリごとの設定 | repository の既定値として marketplace と Plugin を指定する | 効いた | 効かなかった |
 
-取得後は marketplace 定義、Plugin の参照先、README、コードや設定を確認します。取得元が private であることと、中身を安全と判断できることは別です。
+管理用のコマンドは `copilot plugin [SUBCOMMAND] --help` でヘルプを確認できます。
 
-marketplace 定義では、次の値を控えておきます。次節の導入コマンドで使います。
+### 4.1 ステップ1：marketplace を追加する
+
+marketplace は、インストールできる Plugin のレジストリ（カタログ）です。公式資料によると、既定の marketplace として `awesome-copilot` が最初から含まれています。社内の Plugin を使うには、社内 marketplace を追加します。
+
+公式資料では、追加元として次の3つの方法が案内されています。
+
+| 追加元 | コマンド | 向いている場面 |
+| --- | --- | --- |
+| GitHub repository | `copilot plugin marketplace add OWNER/REPOSITORY` | GitHub 上の marketplace を直接追加する |
+| Git URL（GitHub 以外も可） | `copilot plugin marketplace add https://gitlab.com/OWNER/REPO.git` | GitLab など、ほかの場所でホストされた Git repository を追加する |
+| ローカルディレクトリ | `copilot plugin marketplace add /PATH/TO/MARKETPLACE-DIRECTORY` | clone して中身を確認した marketplace を追加する |
+
+```sh
+# GitHub repository を指定する
+copilot plugin marketplace add OWNER/REPOSITORY
+
+# Git URL を指定する
+copilot plugin marketplace add https://gitlab.com/OWNER/REPO.git
+
+# ローカルディレクトリを指定する（実際に clone したパスへ置き換える）
+copilot plugin marketplace add /PATH/TO/MARKETPLACE-DIRECTORY
+```
+
+対話型セッションの中では、`/plugin marketplace add OWNER/REPOSITORY` のようにスラッシュコマンドでも実行できます。
+
+**社内の private repository の場合**
+
+- `OWNER/REPOSITORY` や Git URL で直接追加する方法は公式資料にありますが、private repository を追加するときの認証の扱いは、この草稿では確認できていません。
+- 筆者の環境で確認できたのは、認証済みの環境で clone し、中身を確認したローカルディレクトリを追加する方法です。§3 の確認をしやすい点でも、まずはこの方法をおすすめします。
+
+**識別名を控える**
+
+追加した marketplace の中身（marketplace 定義）で、次の値を控えておきます。次のステップで使います。
 
 - marketplace の識別名（定義の `name`）
 - 導入したい Plugin の識別名（Plugin エントリーの `name`）と参照先（`source`）、記載された版
 
-### 4.2 marketplace 登録と Plugin 導入を分ける
-
-marketplace の登録は「どのカタログから探すか」、Plugin の導入は「その中の何を使うか」という別の操作です。
-
-GitHub Copilot CLI のヘルプでは、marketplace 登録の `<source>` は GitHub の `owner/repo`、URL、ローカルパスに対応しています。この記事では、内容を確認したローカル clone を登録する流れを使います。
+登録済みの marketplace と、その中の Plugin は次のコマンドで確認できます。
 
 ```sh
-# 実際に取得した marketplace リポジトリのパスへ置き換える
-copilot plugin marketplace add /path/to/marketplace-repository
+# 登録済み marketplace の一覧
+copilot plugin marketplace list
 
-# 登録済み marketplace から Plugin を導入する
-copilot plugin install <plugin-name>@<marketplace-name>
+# marketplace 内の Plugin を見る
+copilot plugin marketplace browse MARKETPLACE-NAME
 ```
 
-`<plugin-name>` と `<marketplace-name>` は、前節で控えた Plugin の識別名と marketplace の識別名に置き換えます。筆者の環境（§2）では、この2つの操作の後に VS Code の GitHub Copilot Chat で Plugin のエージェントが表示されました。新しい環境での再現は未確認です。
+### 4.2 ステップ2：Plugin をインストールする
 
-利用者が実行した `copilot plugin add --help` は、`Usage: copilot plugin install [OPTIONS] [source]` と導入例を表示しました。この記事ではその表示に合わせ、`install` 表記を使います。
+marketplace の追加は「どのカタログから探すか」、Plugin のインストールは「その中の何を使うか」という別の操作です。公式資料・CLI のヘルプとも、marketplace から導入する前に、ステップ1で追加しておく必要があります。
 
-特に次の3つを混同しないことが重要です。
+```sh
+copilot plugin install PLUGIN-NAME@MARKETPLACE-NAME
+```
 
-| 値 | 意味 | 現在の確認状況 |
+`PLUGIN-NAME` と `MARKETPLACE-NAME` は、ステップ1で控えた Plugin の識別名と marketplace の識別名に置き換えます。
+
+| 値 | 意味 | 指定する場所 |
 | --- | --- | --- |
-| ローカルフォルダーのパス・名前 | 取得した marketplace の保存先 | `marketplace add <source>` のローカルパスとして指定 |
-| marketplace 定義の `name` | marketplace の識別名 | 導入時は登録済み marketplace 名を `@` の右側に指定 |
-| Plugin 定義の名前 | 導入したい Plugin の識別名 | `plugin@marketplace` の `@` 左側に指定 |
+| ローカルディレクトリのパス・URL | marketplace の追加元 | ステップ1の `marketplace add` |
+| marketplace 定義の `name` | marketplace の識別名 | `@` の右側 |
+| Plugin 定義の `name` | 導入したい Plugin の識別名 | `@` の左側 |
 
-**`@` の右側は、ローカルフォルダー名ではなく登録済み marketplace 名です。**
+**`@` の右側は、ローカルディレクトリ名や URL ではなく、登録済み marketplace の名前です。** 登録済みの名前は `copilot plugin marketplace list` で確認できます。
 
-ヘルプには、marketplace から導入する前に `copilot plugin marketplace add` で登録が必要と明記されています。公開前には登録結果・導入先を確認し、新しい環境で登録・導入を再現します。ヘルプに GitHub／URL の指定があっても private repository の認証成功を保証するものではないため、ここでは private URL の直接登録を前提にしません。
+公式資料によると、marketplace を経由せず、GitHub repository、Git URL、repository のサブディレクトリ、ローカルパスから直接インストールすることもできます。形式は公式リファレンスの「`install` コマンド用プラグインの仕様」にあります。この草稿では、出所を確認しやすい marketplace 経由の方法を扱います。
 
-### 4.3 導入場所と有効化範囲は別に考える
+### 4.3 ステップ3：Plugin を有効化する
 
-| 観点 | 区別するもの |
-| --- | --- |
-| 導入スコープ | User 向けか、Workspace 向けか |
-| 有効化範囲 | 広く有効にするか、その Workspace で有効／無効にするか |
-| 適用先 | CLI、VS Code の Copilot Chat、その他の harness のどれか |
+公式資料では、インストール済みの Plugin を次のコマンドで一覧・切り替えできます。
 
-導入しただけで、すべての Workspace・クライアントで有効になるとは限りません。また、Workspace で無効にすることとアンインストールは別です。
+```sh
+# インストール済み Plugin の一覧
+copilot plugin list
 
-筆者の環境（§2）では、クライアントによって有効にできる範囲が違いました。
+# アンインストールせずにオフにする
+copilot plugin disable PLUGIN-NAME
 
-| クライアント | 利用できた方法 |
-| --- | --- |
-| GitHub Copilot CLI | `.github/copilot/settings.json` の定義（Workspace の既定値）、または CLI での導入 |
-| VS Code の GitHub Copilot Chat | CLI での導入（グローバルに有効化）。harness は Copilot を選択 |
+# オフにした Plugin を再びオンにする
+copilot plugin enable PLUGIN-NAME
+```
 
-CLI の既定の導入先や、Workspace 単位の有効化・無効化の操作は未確認です。選択画面や設定キーを推測して操作しないでください。
+無効化（`disable`）とアンインストール（`uninstall`、§6）は別の操作です。無効化は Plugin を残したまま使わない状態にします。
 
-## 5. CLI と VS Code で、それぞれ利用を確認する
+**VS Code の GitHub Copilot Chat では、グローバルに有効化する必要があった**
 
-以下は実行済みの結果ではなく、新環境での確認項目です。Plugin の README にある、副作用のない代表的な作業を1つ選びます。CLI と VS Code では同じ Workspace・同じ Plugin 版・同じ入力を使い、別々に記録します。
+筆者の環境（§2）では、ステップ1・2を CLI で行い Plugin をグローバルに有効化すると、VS Code の GitHub Copilot Chat（harness は Copilot）のエージェント一覧に Plugin のエージェントが表示されました。ステップ4のディレクトリごとの設定だけでは、VS Code では利用できませんでした。
 
-| 確認先 | 確認すること | 期待する観測 |
-| --- | --- | --- |
-| GitHub Copilot CLI | 対象 Workspace での認識・有効状態と、README に従った呼び出し | 目的の Plugin のスキルやエージェントが見つかり、意図した作業を行える |
-| VS Code の GitHub Copilot Chat | harness に Copilot を選び、エージェント一覧に Plugin のエージェントが表示されるか。README に従った呼び出し | 対象のスキルやエージェントを利用できる |
+`disable`／`enable` で切り替えた結果が VS Code 側にどう反映されるかは、未確認です。
 
-発見・一覧・呼び出しの正確な CLI 構文は確認待ちです。回答がそれらしく見えるだけで Plugin が使われたと判断せず、対象コンポーネントの認識と実行を確認します。
+### 4.4 ステップ4：ディレクトリごとに設定する（`.github/copilot/settings.json`）
 
-VS Code で見つからない場合は、まず harness が Copilot になっているか、CLI で導入（グローバルに有効化）したかを確かめます。それでも見つからない場合は、クライアントの版、ユーザー、実行形態、導入先、組織ポリシーを照合します。未確認の設定変更を代替策として案内することは避けます。
-
-検証記録には、実施者・確認日・環境・各クライアントの版・Plugin と marketplace の版・事前状態・操作・期待結果・実際の結果を残します。未実施や失敗は成功と分けます。
-
-## 6. プロジェクトごとの使い分け
-
-チームが配るリポジトリ既定値と、利用者が自分の Workspace で行う有効化・無効化は別です。設定ファイルが repository にあるだけで、全員のすべてのクライアントへ導入・有効化されるとは考えないでください。
-
-### リポジトリ既定値：`.github/copilot/settings.json`（CLI で確認）
-
-repository に `.github/copilot/settings.json` を置き、marketplace と有効にする Plugin を定義できます。筆者の環境（§2）では、この `.github` の親ディレクトリ配下で GitHub Copilot CLI を起動したとき、定義した Plugin のエージェントを利用できました。
+repository に `.github/copilot/settings.json` を置くと、その repository で使う marketplace と、既定で有効にする Plugin を指定できます。チームで同じ Plugin を使いたいときに便利です。
 
 ```json
 {
   "extraKnownMarketplaces": {
-    "<marketplace-name>": {
+    "MARKETPLACE-NAME": {
       "source": {
         "source": "directory",
-        "path": "./<marketplace-directory>"
+        "path": "./MARKETPLACE-DIRECTORY"
       }
     }
   },
   "enabledPlugins": {
-    "<plugin-name>@<marketplace-name>": true
+    "PLUGIN-NAME@MARKETPLACE-NAME": true
   }
 }
 ```
 
-`<marketplace-name>` は marketplace 定義の `name`、`<plugin-name>` は Plugin の識別名です。確認した環境では、`path` に repository ルートからの相対パスで marketplace のディレクトリを指定していました。
+- `extraKnownMarketplaces`：使う marketplace と、その追加元。上の例はローカルディレクトリを指定しています。確認した環境では、`path` に repository ルートからの相対パスを指定していました。
+- `enabledPlugins`：既定で有効にする Plugin を `PLUGIN-NAME@MARKETPLACE-NAME` の形で指定します。
 
-**この設定だけでは、VS Code の GitHub Copilot Chat では利用できませんでした。** VS Code でも使う場合は、§4.2 のとおり CLI で導入（グローバルに有効化）し、harness に Copilot を選びます。
+筆者の環境（§2）では、この `.github` の親ディレクトリ配下で GitHub Copilot CLI を起動したとき、定義した Plugin のエージェントを利用できました。
 
-公開前には次を埋めます。
+**この設定は、VS Code の GitHub Copilot Chat ではうまく動作しませんでした。** VS Code でも使う場合は、ステップ1〜3を CLI で行い、グローバルに有効化してください。
 
-- 公式資料での `.github/copilot/settings.json` の仕様と、上記の確認結果との差。
-- CLI と VS Code それぞれの Workspace 単位の有効化・無効化方法。
-- チーム既定値と個人の選択の関係。
+`settings.json` のキーの公式な仕様（公式リファレンス「GitHub Copilot CLI の構成ディレクトリ」）とは、まだ照合していません。個人の環境でこの既定値をオフにする方法は、Tips（§7.1）で説明します。
 
-## 7. 更新・無効化・アンインストール
+## 5. CLI と VS Code で、それぞれ利用を確認する
 
-| 操作 | 目的 | 確認する内容 |
+以下は新しい環境で確かめる項目です。Plugin の README にある、副作用のない代表的な作業を1つ選びます。CLI と VS Code では同じ Workspace・同じ Plugin 版・同じ入力を使い、別々に記録します。
+
+| 確認先 | 確認すること | 期待する観測 |
 | --- | --- | --- |
-| 更新 | 新しい版を利用する | clone、marketplace 情報、導入済み Plugin の更新を区別。更新前後の版・差分を確認し、両クライアントで再確認 |
-| 無効化 | 必要な範囲で利用を止める | Workspace 限定か、より広い範囲か。対象 Workspace で有効でなくなったか |
-| アンインストール | 導入済み Plugin を取り除く | 他の Workspace への影響、認識されなくなったか。marketplace の登録解除とは別に確認 |
+| GitHub Copilot CLI | `copilot plugin list` で有効状態を確かめ、対象 Workspace で README に従って呼び出す | 目的の Plugin のスキルやエージェントが見つかり、意図した作業を行える |
+| VS Code の GitHub Copilot Chat | harness に Copilot を選び、エージェント一覧に Plugin のエージェントが表示されるか。README に従って呼び出す | 対象のスキルやエージェントを利用できる |
 
-取得した clone を更新すれば、導入済み Plugin も更新されるとは限りません。更新時も参照先・コード・設定・権限・変更履歴を見直します。追加された hooks や MCP 接続も再確認が必要です。
+回答がそれらしく見えるだけで Plugin が使われたと判断せず、対象コンポーネントの認識と実行を確認します。
 
-実際の更新・無効化・削除コマンドと VS Code の操作名は未照合のため、操作手順は未完成です。管理者が提供する対象版向けの確認済み手順を確認し、不明なら実行を止めて問い合わせてください。
+検証記録には、実施者・確認日・環境・各クライアントの版・Plugin と marketplace の版・事前状態・操作・期待結果・実際の結果を残します。未実施や失敗は成功と分けます。
 
-## 8. 元の Plugin を変えず、プロジェクトに合わせる
+## 6. 更新・削除
 
-### fork／コピーと Workspace 補完の比較
+公式資料では、次のコマンドが案内されています。
+
+```sh
+# Plugin を更新する
+copilot plugin update PLUGIN-NAME
+
+# Plugin を削除する
+copilot plugin uninstall PLUGIN-NAME
+
+# marketplace を削除する（marketplace 名で指定）
+copilot plugin marketplace remove MARKETPLACE-NAME
+```
+
+- marketplace は、追加するときは追加元で、削除するときは `marketplace list` に表示される marketplace 名で指定します。
+- その marketplace の Plugin がインストールされたままだと、`marketplace remove` は失敗します。先に Plugin を削除するか、関連する Plugin もまとめて削除する `--force` を付けます。
+- ローカルディレクトリから追加した場合、clone を更新すれば導入済み Plugin も更新されるとは限りません。clone の更新と `plugin update` を分けて確認します。
+- 更新時も参照先・コード・設定・権限・変更履歴を見直します。追加された hooks や MCP 接続も再確認が必要です。
+
+これらの操作は、筆者の環境ではまだ実行していません。更新・削除の後、CLI と VS Code の両方で状態が変わったかは未確認です。
+
+## 7. 利用上の Tips
+
+### 7.1 プロジェクトごとに使い分ける
+
+チームが repository に置く既定値（ステップ4）と、各利用者の個人の選択は別です。設定ファイルが repository にあるだけで、全員のすべてのクライアントで有効になるとは考えないでください。
+
+公式資料によると、repository の既定値で有効になっている Plugin を自分の環境だけでオフにするには、`.github/copilot/settings.local.json` に `false` を書きます。
+
+```json
+{
+  "enabledPlugins": {
+    "PLUGIN-NAME@MARKETPLACE-NAME": false
+  }
+}
+```
+
+- 保存後、新しいセッションを開始すると反映されます。再びオンにするには `true` に戻します。
+- `settings.local.json` は個人用の設定なので、コミットしないでください。
+- エンタープライズで管理された設定は、repository の既定値やローカルの上書きより優先されます。
+
+この上書きは公式資料の記載で、筆者の環境ではまだ試していません。また、ステップ4と同じく、VS Code の GitHub Copilot Chat に効くかは未確認です。
+
+### 7.2 VS Code の GitHub Copilot Chat で使う
+
+筆者の環境（§2）では、次の2点がそろって初めて、VS Code の GitHub Copilot Chat で Plugin のエージェントが表示されました。
+
+- CLI でステップ1〜3を行い、Plugin をグローバルに有効化している。
+- GitHub Copilot Chat の harness に Copilot を選んでいる。harness が Copilot 以外だと、うまく動作しませんでした。
+
+VS Code で見つからない場合は、まず harness と、CLI で導入済みかを確かめます。それでも見つからない場合は、クライアントの版、ユーザー、実行形態、組織ポリシーを照合します。未確認の設定変更を代替策として試すことは避けます。
+
+### 7.3 元の Plugin を変えず、プロジェクトに合わせる
+
+#### fork／コピーと Workspace 補完の比較
 
 | 方法 | 向いている場面 | 変更元と更新の管理 |
 | --- | --- | --- |
@@ -196,7 +269,7 @@ repository に `.github/copilot/settings.json` を置き、marketplace と有効
 
 インストール済み Plugin のキャッシュを直接編集する方法は勧めません。更新で失われたり、元の版との差が追えなくなったりするためです。
 
-### 具体例は1つ：回答にプロジェクトのテスト確認方法を含める
+#### 具体例は1つ：回答にプロジェクトのテスト確認方法を含める
 
 元の Plugin は変更せず、Workspace 側にプロジェクト固有の指示を追加する例です。**指示文の案であり、配置・適用範囲・効果は未検証です。**
 
@@ -208,21 +281,22 @@ repository に `.github/copilot/settings.json` を置き、marketplace と有効
 
 Plugin のファイルが不変であることと、Workspace の指示が作用したことは別々に確認します。単に回答が変わっただけでは、補完の成功や適用範囲までは確定できません。
 
-## 9. 公開前に残る確認
+## 8. 制約・確認状況
 
-登録・導入の構文は CLI のヘルプで照合し、筆者の環境（§2、VS Code 1.145.3・CLI 1.0.109）で CLI の `settings.json` による利用と、CLI 導入後の VS Code での表示を確認しました。導入先・スコープ、Workspace 単位の有効化・無効化、管理操作、指示ファイルの適用条件、新しい環境での再現は未確認です。
+- marketplace の追加・インストール・有効化・更新・削除のコマンドは、GitHub Docs の公式資料（2026-11-12 確認）と CLI のヘルプで照合しました。
+- 筆者の環境（§2）で確認できたのは、ローカルディレクトリからの追加とインストール、CLI での `settings.json` による利用、CLI 導入後の VS Code での表示です。
+- GitHub／Git URL からの private marketplace の追加、`disable`／`enable`、更新・削除、`settings.local.json` による上書き、Workspace 指示ファイルの適用条件、新しい環境での再現は未確認です。
 
-これらは記事の必須部分なので、説明を削って完成扱いにはしません。公式資料・対象版ヘルプの照合と、人による新環境での実機確認を経て、確認できた操作で本文を完成させます。
+これらは記事の必須部分なので、説明を削って完成扱いにはしません。人による新しい環境での実機確認を経て、確認できた操作で本文を完成させます。
 
 ## 参照
 
-### 公式資料の確認先（今回のページ取得・対象版照合は未実施）
+### 公式資料
 
-- [VS Code: Agent plugins](https://code.visualstudio.com/docs/agent-customization/agent-plugins) — 既存要件が参照する利用ガイド。資料の対象版は未確認。
+- [GitHub Copilot CLI のプラグインの検索とインストール（GitHub Docs）](https://docs.github.com/ja/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing) — marketplace の追加元3種、インストール、一覧・有効化・無効化・更新・削除、marketplace の削除、`settings.local.json` による上書き。2026-11-12 確認。ページに対象版の記載はなし。
+- [VS Code: Agent plugins](https://code.visualstudio.com/docs/agent-customization/agent-plugins) — VS Code の利用ガイド。内容と対象版は未照合。
 
-### 草稿の根拠（ローカル資料・既報告）
+### 筆者の確認
 
-- GitHub Copilot CLI のヘルプ出力：`copilot --version`、`copilot plugin marketplace add --help`、`copilot plugin add --help`。登録元の形式、登録必須条件、`plugin@marketplace` 構文、`install` 表記を照合。
-- 筆者の環境での確認（2026-11-12、§2）：CLI での `settings.json` による利用、CLI 導入後の VS Code での表示、harness による違い。
-
-上記のローカル参照は執筆用です。Qiita 公開前に、公開可能な固定版 URL への置き換えと社内情報の非掲載を確認します。
+- GitHub Copilot CLI のヘルプ出力：`copilot plugin marketplace add --help`、`copilot plugin add --help`。追加元の形式、事前登録の必要性、`plugin@marketplace` 構文、`install` 表記を照合。
+- 筆者の環境での確認（2026-11-12、§2）：ローカルディレクトリからの追加とインストール、CLI での `settings.json` による利用、CLI 導入後の VS Code での表示、harness による違い。

@@ -1,5 +1,15 @@
 # 作業メモ
 
+## 2026-11-12: GitHub Docs「GitHub Copilot CLI のプラグインの検索とインストール」の照合
+
+- 出典: https://docs.github.com/ja/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing （利用者が提示。2026-11-12 に WebFetch で取得。ページに最終更新日・対象版の記載なし）。
+- marketplace の追加元は3つ: `copilot plugin marketplace add OWNER/REPOSITORY`、Git URL（例 `https://gitlab.com/OWNER/REPO.git`）、ローカルディレクトリ `/PATH/TO/MARKETPLACE-DIRECTORY`。対話型セッションでは `/plugin marketplace add ...`。既定の marketplace として `awesome-copilot` が含まれる。
+- 一覧・参照: `copilot plugin marketplace list`、`copilot plugin marketplace browse MARKETPLACE-NAME`。インストール: `copilot plugin install PLUGIN-NAME@MARKETPLACE-NAME`。GitHub repo・Git URL・サブディレクトリ・ローカルパスからの直接インストールも可（形式はリファレンスの「install コマンド用プラグインの仕様」、未取得）。
+- 管理: `copilot plugin list`／`update`／`disable`（アンインストールせずオフ）／`enable`／`uninstall`。`copilot plugin marketplace remove MARKETPLACE-NAME` は名前で指定し、Plugin が残っていると失敗、`--force` で関連 Plugin も削除。
+- 既定値の個人上書き: `.github/copilot/settings.local.json` の `enabledPlugins` に `"PLUGIN@MARKETPLACE": false`。新しいセッションで反映、コミットしない、エンタープライズ管理設定が優先。
+- ページに記載がないこと: private repository を追加するときの認証、インストール先のパス、`settings.json` の `extraKnownMarketplaces` のキー仕様（リファレンス「GitHub Copilot CLI の構成ディレクトリ」は未取得）、VS Code への反映。
+- これらは公式資料の記載で、筆者環境での実行確認は marketplace のローカルディレクトリ追加・install・settings.json（CLI）だけ。
+
 ## 2026-11-12: 利用者による実機確認（環境と結果）
 
 - 出典は利用者の会話での共有。確認者は利用者（人）。

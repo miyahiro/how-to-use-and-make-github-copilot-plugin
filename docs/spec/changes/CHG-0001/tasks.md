@@ -1,5 +1,11 @@
 # CHG-0001 タスク一覧
 
+## 2026-11-12: 利用編の構成変更と公式資料の照合
+
+- 利用者の依頼で、利用編を「marketplace の追加 → Plugin のインストール → Plugin の有効化 → ディレクトリごとの設定」の4ステップの章（§4）と、利用上の Tips の章（§7、節ごとに Tips）に再構成した。設計 DES-USE-001 の章構成と DES-USE-004 の追加元の扱いを合わせて変更した（design の再承認が必要）。
+- TASK-1・2・3 の一部: 利用者提示の GitHub Docs ページを取得し、marketplace の追加元3種（OWNER/REPOSITORY、Git URL、ローカルディレクトリ）、install、list／update／disable／enable／uninstall、marketplace remove、settings.local.json を記事に反映。VS Code Agent plugins ページ、CLI 構成ディレクトリ・install 仕様のリファレンスは未取得。
+- 確認: 記事の見出し構成を設計の章構成表と目視照合。コマンドは取得したページの記載と目視照合。実機での GitHub／Git URL 追加、disable／enable、update／uninstall、settings.local.json は未実施。
+
 ## 2026-11-12: 利用編の sdd 記述削除と実機確認結果の反映
 
 - TASK-7 の一部を更新。利用者の依頼により、読者が参照できない sdd（参考実装・marketplace 定義・README・導入例の名前）への言及を `articles/plugin-usage.md` から削除し、導入例・settings.json 例を `<plugin-name>@<marketplace-name>` 等のプレースホルダーにした。利用編の要件・設計に sdd の記載はなく、必須説明の削除には当たらない。
